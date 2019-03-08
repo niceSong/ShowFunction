@@ -1,35 +1,20 @@
 package function.base;
 
-import display.TDisplay;
+import display.Canvas;
+import function.various.PolylineSwingFunc;
 
+import javax.swing.*;
+import java.awt.*;
 
 public abstract class Function {
     /*
-     *X��Y�Ƿ����㺯��
+     * X/Y --match?--> function
+     * diffrent subclass have diffrent match method
      */
-    public abstract boolean result(int x, int y);
+    public abstract void add(Function func);
+    public abstract void remove(Function func);
+    public abstract String Getname();
+    /* 填充画布 */
+    public abstract void view(Canvas canvas);
 
-    public abstract void printtest();
-
-    /*
-     *���������б�ʾ����������X Y
-     */
-    public int[][] WriteImage(int[][] Image){
-        int xlength = Image.length;
-        int ylength = Image[0].length;
-
-        System.out.println("xlength = "+xlength);
-        System.out.println("ylength = "+ylength);
-
-        for(int x = -(xlength/2); x < (xlength/2); x++){
-            for(int y = -(ylength/2); y < (ylength/2); y++){
-                if(result(x, y)) {
-                    Image[x+ xlength/2 ][y + ylength/2] = 3;
-                }
-
-            }
-        }
-
-        return Image;
-    }
-}
+}//Function

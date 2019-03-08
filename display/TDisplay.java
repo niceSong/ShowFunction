@@ -1,104 +1,83 @@
 package display;
 
 import function.base.Function;
-import java.util.Map;
-import java.util.HashMap;
+import function.various.Composite;
+
+import javax.swing.*;
+import java.awt.*;
 import java.lang.String;
 
 
-public class TDisplay {
-    /* ���������ݳ�Ա�����������顢map<��������Function> */
-    private final int Xcoordinate;
-    private final int Ycoordinate;
-    private int[][] Image;
-    public Map<String, Function> FunctionMap;
+public class TDisplay{
+    public Canvas canvas;
+    public Composite composite;
+    public Function function;
 
-
-    /* Builder��ʽ��ʼ�����ݳ�Ա */
-    public static class Builder {
-        private final int Xcoordinate;
-        private final int Ycoordinate;
-
-        public Builder(int ImageX, int ImageY) {
-            this.Xcoordinate = ImageX;
-            this.Ycoordinate = ImageY;
-        }
-
-        public TDisplay build(){
-            return new TDisplay(this);
-        }
-
-
-    }//Builder
-
-    private TDisplay(Builder builder){
-        Xcoordinate = builder.Xcoordinate;
-        Ycoordinate = builder.Ycoordinate;
-        Image = new int[builder.Xcoordinate][builder.Ycoordinate];
-        FunctionMap = new HashMap<String, Function>();
-    }
-
-    public void XYreturn(){
-        System.out.println("xlength = "+Image.length);
-        System.out.println("ylength = "+Image[0].length);
-    }
-
-    /* ��ʾ����ϵ���� */
-    public void ShowCoordinate() {
-        for(int x = 0; x < Xcoordinate; x++){
-            Image[x][Ycoordinate / 2] = 1;  //x����ϵ
-        }
-        for(int y = 0; y < Ycoordinate; y++){
-            Image[Xcoordinate / 2][y] = 2;  //y����ϵ
-        }
-    }
-
-    /* HashMap ���*/
-    public void addmap(String FuncName, Function function){
-        FunctionMap.put(FuncName, function);
+    public TDisplay(){
+        canvas = new Canvas.Builder(800, 800).build();
+        composite = new Composite();
     }
 
 
-    /* HashMap ɾ�� */
-    public void deletemap(String FuncName) {
-        FunctionMap.remove(FuncName);
-    }
+    /* 显示画布 */
+    public void DisplayCanvas(Canvas canvas, Graphics gr){
 
-
-    /* HashMap���ң�ͼ��д������ */
-    public void findmap(String FuncName){
-        Function function = FunctionMap.get(FuncName);
-        Image = function.WriteImage(Image);
-    }
-
-    /* ��ʾ����ͼ�� */
-    public void ShowImage(String FuncName) {
-        this.findmap(FuncName);
-
-        for(int i = 0; i < Xcoordinate; ++i){
-            for(int j = 0; j < Ycoordinate; ++j){
-                switch(Image[i][j]){
+        for(int x = 0; x < canvas.GetHight(); x++){
+            for(int y = 0; y < canvas.Getwidth(); y++){
+                switch(canvas.GetImage(x, y)){
                     case 0:
-                        System.out.print("   ");
-                        break;
-                    case 1:
-                        System.out.print(" | ");
-                        break;
-                    case 2:
-                        System.out.print(" -- ");
+                        gr.setColor(Color.PINK);
+                        gr.fillOval(x, canvas.GetHight()-y, 2, 2);
                         break;
                     case 3:
-                        System.out.print(" * ");
+                        //System.out.println("坐标值是："+y+" "+x);
+                        gr.setColor(Color.BLUE);
+                        gr.fillOval(x, canvas.GetHight()-y, 2, 2);
+                        break;
+
+                    default:
                         break;
                 }
             }
-            System.out.println("");
         }
-
     }
 
-    public void ClearImage(){
-        Image = new int[Xcoordinate][Ycoordinate];
+
+    private class NewJPanel extends JPanel {
+        @Override
+        public void paint(Graphics g) {
+            super.paint(g);//加上这一句，窗体背景色就会画出来
+            Graphics gr = g;
+            //gr.setColor(Color.PINK);
+            canvas.ShowAxis();
+            //画Image
+            function.view(canvas);
+            DisplayCanvas(canvas, gr);
+        }
+    }//class NewJPanel
+
+    public void Show(){
+        JFrame frame = new JFrame();
+        //frame.getContentPane().setBackground(Color.BLUE);
+        frame.setTitle("Show Polyline");
+        frame.setSize(800, 800);
+        Container contentPane = frame.getContentPane();
+        contentPane.add(new NewJPanel());
+        frame.show();
     }
+
+    /*
+     * select function from Hashmap,
+     * and write data in Image array.
+     */
+    public void ShowImage(String FuncName){
+        function =  composite.ReturnFunc(FuncName);
+        //显示Image
+        Show();
+    }
+
+
 
 }//TDisplay
+
+
